@@ -1,0 +1,18 @@
+{
+  "name": "electron-in-page-search-example",
+  "version": "0.0.0",
+  "private": true,
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "rhysd <lin90162@yahoo.co.jp>",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "electron": "^1.4.5"
+  }
+}
