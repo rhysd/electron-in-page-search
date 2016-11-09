@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc -p src/",
     "lint": "tslint $(git ls-files | grep -E \"\\.ts$\")",
+    "watch": "guard --watchdir src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
