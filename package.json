@@ -4,6 +4,7 @@
   "description": "Electron module to provide in-page search feature",
   "main": "src/index.js",
   "scripts": {
+    "build": "tsc -p src/",
     "lint": "tslint $(git ls-files | grep -E \"\\.ts$\")",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,6 +21,7 @@
   "author": "rhysd <lin90162@yahoo.co.jp>",
   "license": "MIT",
   "devDependencies": {
+    "@types/electron": "^1.4.26",
     "tslint": "^3.15.1",
     "typescript": "^2.0.8"
   }
