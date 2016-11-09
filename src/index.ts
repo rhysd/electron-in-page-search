@@ -6,7 +6,6 @@ const ShouldDebug = process.env.ELECTRON_IN_PAGE_SEARCH_DEBUG === 'development';
 const log = ShouldDebug ? console.log.bind(console) : function nop() { /* nop */ };
 
 export interface InPageSearchOptions {
-    startWord?: string;
     searchWindowWebview?: Electron.WebViewElement;
 }
 
@@ -21,24 +20,25 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
     options = options || {};
     if (!options.searchWindowWebview) {
         options.searchWindowWebview = document.createElement('webview');
+        document.body.appendChild(options.searchWindowWebview);
     }
     if (!options.searchWindowWebview.src) {
         options.searchWindowWebview.src = DefaultSearchWindowHtml;
     }
     return new InPageSearch(
         options.searchWindowWebview,
-        options.startWord || '',
         searchTarget,
     );
 }
 
 export class InPageSearch extends EventEmitter {
     private findInPage: FindInPage;
-    private requestId = 0;
+    private requestId: number | null = null;
+    private prevQuery: string;
+    private activeIdx: number = 0;
 
     constructor(
         public searcher: Electron.WebViewElement,
-        private word: string,
         target: SearchTarget,
     ) {
         super();
@@ -46,17 +46,15 @@ export class InPageSearch extends EventEmitter {
         this.registerFoundCallback(target);
         this.setupSearchWindowWebview();
         this.searcher.classList.add('search-inactive');
-        if (word !== '') {
-            this.startSearch(word);
-        }
+        this.prevQuery = '';
     }
 
-    startSearch(word: string) {
-        log('Start to search:', word);
+    openSearchWindow(word: string) {
+        log('search:', word);
         this.searcher.classList.remove('search-inactive');
         this.searcher.classList.add('search-active');
+        this.emit('open');
         this.focusOnInput()
-        this.emit('start', word);
         // TODO
     }
 
@@ -64,16 +62,58 @@ export class InPageSearch extends EventEmitter {
         this.searcher.classList.remove('search-active');
         this.searcher.classList.add('search-inactive');
         this.emit('stop');
+        this.requestId = null;
+        this.prevQuery = '';
+    }
+
+    isSearching() {
+        return this.requestId !== null;
+    }
+
+    startToFind(query: string) {
+        this.requestId = this.findInPage(query);
+        this.prevQuery = query;
+        this.emit('start');
+        this.focusOnInput();
+    }
+
+    findNext(forward: boolean) {
+        if (!this.isSearching()) {
+            throw new Error('Search did not start yet. Use .startToFind() method to start the search');
+        }
+        this.requestId = this.findInPage(this.prevQuery, {
+            forward,
+            findNext: true,
+        });
+        this.emit('next', this.prevQuery, forward);
+        this.focusOnInput();
     }
 
     private onSearchQuery(text: string) {
         log('Query from search window webview:', text);
-        // TODO
+
+        if (text === '') {
+            this.stopSearch();
+            return;
+        }
+
+        if (!this.isSearching() || this.prevQuery !== text) {
+            this.startToFind(text);
+        } else {
+            this.findNext(true);
+        }
     }
 
     private onFoundInPage(result: Electron.FoundInPageResult) {
-        log('Found: result', result, 'word:', this.word);
-        // TODO
+        if (this.requestId !== result.requestId) {
+            return;
+        }
+        if (result.activeMatchOrdinal) {
+            this.activeIdx = result.activeMatchOrdinal;
+        }
+        if (result.finalUpdate && result.matches) {
+            this.sendResult(this.activeIdx, result.matches);
+        }
     }
 
     private registerFoundCallback(target: SearchTarget) {
@@ -118,4 +158,8 @@ export class InPageSearch extends EventEmitter {
         this.emit('focus-input');
     }
 
+    private sendResult(nth: number, all: number) {
+        this.searcher.send('electron-page-in-search:result', nth, all);
+        this.emit('found', this.prevQuery, nth, all);
+    }
 }
