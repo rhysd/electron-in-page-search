@@ -9,7 +9,9 @@ export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebViewElement;
 }
 
-type FindInPage = (text: string, options?: Electron.FindInPageOptions) => number
+type RequestId = number;
+type FindInPage = (text: string, options?: Electron.FindInPageOptions) => RequestId;
+type StopFindInPage = (action: Electron.StopFindInPageAtion) => void;
 type SearchTarget = Electron.WebContents | Electron.WebViewElement;
 
 function isWebView(target: any): target is Electron.WebViewElement {
@@ -58,7 +60,8 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
 export class InPageSearch extends EventEmitter {
     public opened = false;
     private findInPage: FindInPage;
-    private requestId: number | null = null;
+    private stopFindInPage: StopFindInPage;
+    private requestId: RequestId | null = null;
     private prevQuery: string;
     private activeIdx: number = 0;
 
@@ -68,6 +71,7 @@ export class InPageSearch extends EventEmitter {
     ) {
         super();
         this.findInPage = target.findInPage.bind(target);
+        this.stopFindInPage = target.stopFindInPage.bind(target);
         this.registerFoundCallback(target);
         this.setupSearchWindowWebview();
         this.searcher.classList.add('search-inactive');
@@ -83,6 +87,7 @@ export class InPageSearch extends EventEmitter {
     }
 
     stopSearch() {
+        this.stopFindInPage('clearSelection');
         this.searcher.classList.remove('search-active');
         this.searcher.classList.add('search-inactive');
         this.emit('stop');
