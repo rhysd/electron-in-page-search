@@ -163,22 +163,22 @@ export class InPageSearch extends EventEmitter {
         // TODO: Inject IPC code to send the user input
         this.searcher.addEventListener('ipc-message', event => {
             switch (event.channel) {
-                case 'electron-page-in-search:query': {
+                case 'electron-in-page-search:query': {
                     const text = event.args[0] as string;
                     this.onSearchQuery(text);
                     break;
                 }
-                case 'electron-page-in-search:close': {
+                case 'electron-in-page-search:close': {
                     this.stopSearch();
                     break;
                 }
-                case 'electron-page-in-search:back': {
+                case 'electron-in-page-search:back': {
                     if (this.isSearching()) {
                         this.findNext(false);
                     }
                     break;
                 }
-                case 'electron-page-in-search:forward': {
+                case 'electron-in-page-search:forward': {
                     if (this.isSearching()) {
                         this.findNext(true);
                     }
@@ -197,12 +197,12 @@ export class InPageSearch extends EventEmitter {
 
     private focusOnInput() {
         this.searcher.focus();
-        this.searcher.send('electron-page-in-search:focus');
+        this.searcher.send('electron-in-page-search:focus');
         this.emit('focus-input');
     }
 
     private sendResult(nth: number, all: number) {
-        this.searcher.send('electron-page-in-search:result', nth, all);
+        this.searcher.send('electron-in-page-search:result', nth, all);
         this.emit('found', this.prevQuery, nth, all);
     }
 }

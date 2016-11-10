@@ -14,19 +14,19 @@ search_button.addEventListener('click', () => {
     if (input === '') {
         return;
     }
-    ipc.sendToHost('electron-page-in-search:query', input);
+    ipc.sendToHost('electron-in-page-search:query', input);
 });
 
 back_button.addEventListener('click', () => {
-    ipc.sendToHost('electron-page-in-search:back');
+    ipc.sendToHost('electron-in-page-search:back');
 });
 
 forward_button.addEventListener('click', () => {
-    ipc.sendToHost('electron-page-in-search:forward');
+    ipc.sendToHost('electron-in-page-search:forward');
 });
 
 close_button.addEventListener('click', () => {
-    ipc.sendToHost('electron-page-in-search:close');
+    ipc.sendToHost('electron-in-page-search:close');
 });
 
 search_input.addEventListener('keydown', e => {
@@ -35,14 +35,14 @@ search_input.addEventListener('keydown', e => {
     }
     switch(e.code) {
     case 'Enter':
-        ipc.sendToHost('electron-page-in-search:query', search_input.value);
+        ipc.sendToHost('electron-in-page-search:query', search_input.value);
         break;
     case 'Escape':
-        ipc.sendToHost('electron-page-in-search:close');
+        ipc.sendToHost('electron-in-page-search:close');
         break;
     case 'KeyG':
         if (e.ctrlKey) {
-            ipc.sendToHost('electron-page-in-search:close');
+            ipc.sendToHost('electron-in-page-search:close');
         }
         break;
     default:
@@ -56,11 +56,11 @@ search_input.addEventListener('compositionend', () => {
     in_composition = false;
 });
 
-ipc.on('electron-page-in-search:focus', () => {
+ipc.on('electron-in-page-search:focus', () => {
     search_input.focus();
 });
 
-ipc.on('electron-page-in-search:result', (_: any, nth: number, all: number) => {
+ipc.on('electron-in-page-search:result', (_: any, nth: number, all: number) => {
     matches.innerText = `${nth}/${all}`;
 });
 
