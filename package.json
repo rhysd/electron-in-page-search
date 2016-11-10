@@ -7,6 +7,7 @@
     "build": "tsc -p src/",
     "lint": "tslint $(git ls-files | grep -E \"\\.ts$\")",
     "watch": "guard --watchdir src",
+    "prepublish": "npm run lint && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

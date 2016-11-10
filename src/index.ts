@@ -64,7 +64,7 @@ export class InPageSearch extends EventEmitter {
         this.searcher.classList.remove('search-inactive');
         this.searcher.classList.add('search-active');
         this.emit('open');
-        this.focusOnInput()
+        this.focusOnInput();
         // TODO
     }
 
