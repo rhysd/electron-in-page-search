@@ -52,17 +52,21 @@ search_input.addEventListener('keydown', e => {
         }
         break;
     default:
-        break;
+        return;
     }
+    console.log('Keydown:', e);
 });
+
 search_input.addEventListener('compositionstart', () => {
     in_composition = true;
 });
+
 search_input.addEventListener('compositionend', () => {
     in_composition = false;
 });
 
 ipc.on('electron-in-page-search:focus', () => {
+    console.log('Focus on input');
     search_input.focus();
 });
 

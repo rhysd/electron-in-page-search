@@ -49,7 +49,7 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
         options.searchWindowWebview = document.createElement('webview');
         options.searchWindowWebview.className = 'electron-in-page-search-window';
         options.searchWindowWebview.setAttribute('nodeintegration', '');
-        options.searchWindowWebview.style.outline = 0;
+        options.searchWindowWebview.style.outline = '0';
         document.body.appendChild(options.searchWindowWebview);
     }
 
@@ -195,7 +195,6 @@ export class InPageSearch extends EventEmitter {
     }
 
     private setupSearchWindowWebview() {
-        // TODO: Inject IPC code to send the user input
         this.searcher.addEventListener('ipc-message', event => {
             switch (event.channel) {
                 case 'electron-in-page-search:query': {
@@ -242,9 +241,14 @@ export class InPageSearch extends EventEmitter {
 
     private focusOnInput() {
         log('Set focus on search window');
-        this.searcher.focus();
-        this.searcher.send('electron-in-page-search:focus');
-        this.emit('focus-input');
+        // XXX:
+        // Directly calling .focus() doesn't focus on <webview> here.
+        // We need to delay the call in order to fix it.
+        setImmediate(() => {
+            this.searcher.focus();
+            this.searcher.send('electron-in-page-search:focus');
+            this.emit('focus-input');
+        });
     }
 
     private sendResult(nth: number, all: number) {
