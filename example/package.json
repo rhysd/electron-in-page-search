@@ -6,6 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "debug": "ELECTRON_IN_PAGE_SEARCH_DEBUG=true electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
