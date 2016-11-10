@@ -18,13 +18,23 @@ function isWebView(target: any): target is Electron.WebViewElement {
 
 export default function searchInPage(searchTarget: SearchTarget, options?: InPageSearchOptions) {
     options = options || {};
+
     if (!options.searchWindowWebview) {
         options.searchWindowWebview = document.createElement('webview');
         document.body.appendChild(options.searchWindowWebview);
     }
+
     if (!options.searchWindowWebview.src) {
         options.searchWindowWebview.src = DefaultSearchWindowHtml;
     }
+
+    const injected_script = path.join(__dirname, 'search-window.js');
+    options.searchWindowWebview.executeJavaScript(`(function(){
+        const s = document.createElement('script');
+        s.src = 'file://${injected_script}';
+        document.body.appendChild(s);
+    })()`);
+
     return new InPageSearch(
         options.searchWindowWebview,
         searchTarget,
@@ -142,6 +152,18 @@ export class InPageSearch extends EventEmitter {
                     this.stopSearch();
                     break;
                 }
+                case 'electron-page-in-search:back': {
+                    if (this.isSearching()) {
+                        this.findNext(false);
+                    }
+                    break;
+                }
+                case 'electron-page-in-search:forward': {
+                    if (this.isSearching()) {
+                        this.findNext(true);
+                    }
+                    break;
+                }
                 default:
                     break;
             }
@@ -155,6 +177,7 @@ export class InPageSearch extends EventEmitter {
 
     private focusOnInput() {
         this.searcher.focus();
+        this.searcher.send('electron-page-in-search:focus');
         this.emit('focus-input');
     }
 
