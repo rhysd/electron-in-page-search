@@ -18,11 +18,11 @@ search_button.addEventListener('click', () => {
 });
 
 back_button.addEventListener('click', () => {
-    ipc.sendToHost('electron-in-page-search:back');
+    ipc.sendToHost('electron-in-page-search:back', search_input.value);
 });
 
 forward_button.addEventListener('click', () => {
-    ipc.sendToHost('electron-in-page-search:forward');
+    ipc.sendToHost('electron-in-page-search:forward', search_input.value);
 });
 
 close_button.addEventListener('click', () => {
@@ -33,7 +33,7 @@ search_input.addEventListener('keydown', e => {
     if (in_composition) {
         return;
     }
-    switch(e.code) {
+    switch (e.code) {
     case 'Enter':
         ipc.sendToHost('electron-in-page-search:query', search_input.value);
         break;
@@ -64,3 +64,7 @@ ipc.on('electron-in-page-search:result', (_: any, nth: number, all: number) => {
     matches.innerText = `${nth}/${all}`;
 });
 
+ipc.on('electron-in-page-search:close', () => {
+    search_input.value = '';
+    matches.innerText = '0/0';
+});

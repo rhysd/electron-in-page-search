@@ -86,8 +86,9 @@ export class InPageSearch extends EventEmitter {
         this.focusOnInput();
     }
 
-    stopSearch() {
-        this.stopFindInPage('clearSelection');
+    closeSearchWindow() {
+        this.stopFind();
+        this.searcher.send('electron-in-page-search:close');
         this.searcher.classList.remove('search-active');
         this.searcher.classList.add('search-inactive');
         this.emit('stop');
@@ -119,11 +120,15 @@ export class InPageSearch extends EventEmitter {
         this.focusOnInput();
     }
 
+    stopFind() {
+        this.stopFindInPage('clearSelection');
+    }
+
     private onSearchQuery(text: string) {
         log('Query from search window webview:', text);
 
         if (text === '') {
-            this.stopSearch();
+            this.closeSearchWindow();
             return;
         }
 
@@ -135,6 +140,8 @@ export class InPageSearch extends EventEmitter {
     }
 
     private onFoundInPage(result: Electron.FoundInPageResult) {
+        log('Found:', result);
+
         if (this.requestId !== result.requestId) {
             return;
         }
@@ -169,18 +176,28 @@ export class InPageSearch extends EventEmitter {
                     break;
                 }
                 case 'electron-in-page-search:close': {
-                    this.stopSearch();
+                    this.closeSearchWindow();
                     break;
                 }
                 case 'electron-in-page-search:back': {
                     if (this.isSearching()) {
                         this.findNext(false);
+                    } else {
+                        const text = event.args[0] as string;
+                        if (text) {
+                            this.onSearchQuery(text);
+                        }
                     }
                     break;
                 }
                 case 'electron-in-page-search:forward': {
                     if (this.isSearching()) {
                         this.findNext(true);
+                    } else {
+                        const text = event.args[0] as string;
+                        if (text) {
+                            this.onSearchQuery(text);
+                        }
                     }
                     break;
                 }
@@ -190,18 +207,20 @@ export class InPageSearch extends EventEmitter {
         });
         if (ShouldDebug) {
             this.searcher.addEventListener('console-message', e => {
-                log('Console message from search window:', e.line, e.message);
+                log('Console message from search window:', `line:${e.line}: ${e.message}`, e.sourceId);
             });
         }
     }
 
     private focusOnInput() {
+        log('Set focus on search window');
         this.searcher.focus();
         this.searcher.send('electron-in-page-search:focus');
         this.emit('focus-input');
     }
 
     private sendResult(nth: number, all: number) {
+        log('Send result:', nth, all);
         this.searcher.send('electron-in-page-search:result', nth, all);
         this.emit('found', this.prevQuery, nth, all);
     }
