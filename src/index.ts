@@ -7,6 +7,8 @@ const log = ShouldDebug ? console.log.bind(console) : function nop() { /* nop */
 
 export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebViewElement;
+    customCssPath?: string;
+    openDevToolsOfSearchWindow?: boolean;
 }
 
 type RequestId = number;
@@ -18,9 +20,14 @@ function isWebView(target: any): target is Electron.WebViewElement {
     return target.tagName !== undefined && target.tagName === 'WEBVIEW';
 }
 
-function injectScriptToWebView(target: Electron.WebViewElement) {
+function injectScriptToWebView(target: Electron.WebViewElement, opts: InPageSearchOptions) {
     const injected_script = path.join(__dirname, 'search-window.js');
+    const css = opts.customCssPath || path.join(__dirname, 'default-style.css');
     const script = `(function(){
+        const l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = '${css}';
+        document.head.appendChild(l);
         const s = document.createElement('script');
         s.src = 'file://${injected_script}';
         document.body.appendChild(s);
@@ -42,14 +49,27 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
         options.searchWindowWebview = document.createElement('webview');
         options.searchWindowWebview.className = 'electron-in-page-search-window';
         options.searchWindowWebview.setAttribute('nodeintegration', '');
+        options.searchWindowWebview.style.outline = 0;
         document.body.appendChild(options.searchWindowWebview);
     }
 
-    if (!options.searchWindowWebview.src) {
-        options.searchWindowWebview.src = DefaultSearchWindowHtml;
+    const wv = options.searchWindowWebview;
+
+    if (!wv.src) {
+        wv.src = DefaultSearchWindowHtml;
     }
 
-    injectScriptToWebView(options.searchWindowWebview);
+    injectScriptToWebView(wv, options);
+
+    if (options.openDevToolsOfSearchWindow) {
+        if (wv.getWebContents) {
+            wv.getWebContents().openDevTools({mode: 'detach'});
+        } else {
+            wv.addEventListener('dom-ready', () => {
+                wv.getWebContents().openDevTools({mode: 'detach'});
+            });
+        }
+    }
 
     return new InPageSearch(
         options.searchWindowWebview,
@@ -79,6 +99,10 @@ export class InPageSearch extends EventEmitter {
     }
 
     openSearchWindow() {
+        if (this.opened) {
+            log('Already opened');
+            return;
+        }
         this.searcher.classList.remove('search-inactive');
         this.searcher.classList.add('search-active');
         this.opened = true;
@@ -87,6 +111,10 @@ export class InPageSearch extends EventEmitter {
     }
 
     closeSearchWindow() {
+        if (!this.opened) {
+            log('Already closed');
+            return;
+        }
         this.stopFind();
         this.searcher.send('electron-in-page-search:close');
         this.searcher.classList.remove('search-active');

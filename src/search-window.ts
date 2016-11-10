@@ -9,21 +9,27 @@ const search_input = document.querySelector('.inpage-search-input') as HTMLInput
 
 let in_composition = false;
 
-search_button.addEventListener('click', () => {
-    const input = search_input.value;
-    if (input === '') {
-        return;
-    }
-    ipc.sendToHost('electron-in-page-search:query', input);
-});
+if (search_button !== null) {
+    search_button.addEventListener('click', () => {
+        const input = search_input.value;
+        if (input === '') {
+            return;
+        }
+        ipc.sendToHost('electron-in-page-search:query', input);
+    });
+}
 
-back_button.addEventListener('click', () => {
-    ipc.sendToHost('electron-in-page-search:back', search_input.value);
-});
+if (back_button !== null) {
+    back_button.addEventListener('click', () => {
+        ipc.sendToHost('electron-in-page-search:back', search_input.value);
+    });
+}
 
-forward_button.addEventListener('click', () => {
-    ipc.sendToHost('electron-in-page-search:forward', search_input.value);
-});
+if (forward_button !== null) {
+    forward_button.addEventListener('click', () => {
+        ipc.sendToHost('electron-in-page-search:forward', search_input.value);
+    });
+}
 
 close_button.addEventListener('click', () => {
     ipc.sendToHost('electron-in-page-search:close');
