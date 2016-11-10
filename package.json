@@ -1,13 +1,13 @@
 {
   "name": "electron-in-page-search",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Electron module to provide in-page search feature",
   "main": "src/index.js",
   "scripts": {
     "build": "tsc -p src/",
     "lint": "tslint $(git ls-files | grep -E \"\\.ts$\")",
     "watch": "guard --watchdir src",
-    "prepublish": "npm run lint && npm run build",
+    "preversion": "npm run lint && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
