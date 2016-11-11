@@ -33,6 +33,16 @@ function injectScriptToWebView(target: Electron.WebViewElement, opts: InPageSear
         document.body.appendChild(s);
     })()`;
 
+    // XXX:
+    // Before <webview> completes to load its web contents, .getWebContents()
+    // (and some other APIs) have some 'statuses'.
+    //
+    // 1. .getWebContents property does not exist
+    // 2. .getWebContents property exsit but .getWebContents() returns undefined
+    //
+    // So we need to check both 1. and 2. Note that <webview> instance doesn't
+    // have the method to check whether it's dom-ready or not such as .isReady()
+    // of app instance.
     if (target.getWebContents && target.getWebContents()) {
         target.executeJavaScript(script);
     } else {
@@ -62,6 +72,9 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
     injectScriptToWebView(wv, options);
 
     if (options.openDevToolsOfSearchWindow) {
+        // XXX:
+        // Please check the comment in injectScriptToWebView() function to know
+        // why .getWebContents property is checked here.
         const wc = wv.getWebContents && wv.getWebContents();
         if (wc) {
             wc.openDevTools({mode: 'detach'});
@@ -254,11 +267,27 @@ export class InPageSearch extends EventEmitter {
         });
     }
 
+    // XXX:
+    // Search API's behavior is different depending on a target.
+    //
+    // When the search target is BrowserWindow, focus to <webview> will be
+    // cleared after calling .findInPage(). So we need to focus on <webview>
+    // after that. Below method does it.
+    //
+    // When the search target is <webview>, focus to <webview> (for search window)
+    // won't be cleared. So we need to focus on search window <webview> again after
+    // calling .findInPage(). Futhermore, we should not focus on it because of
+    // <webview> bug. calling .focus() on search window <webview> also gives a focus
+    // to another <webview>. As the result, search window <webview> can't have a focus.
+    //
+    // https://github.com/electron/electron/issues/7939
+    //
+    // At opening search window webview, it needs to give a focus to the webview
+    // anyway in order to set first focus to <input> in it.
     private focusOnInputOnBrowserWindow() {
         if (this.targetIsWebview) {
             return;
         }
-        // XXX
         this.focusOnInput();
     }
 
