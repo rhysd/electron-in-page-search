@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p src/",
     "lint": "tslint $(git ls-files | grep -E \"\\.ts$\")",
-    "example": "cd example/browser-window && npm start",
+    "example": "npm install && cd example/browser-window && npm start",
     "watch": "guard --watchdir src",
     "preversion": "npm run lint && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,6 +25,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/electron": "^1.4.26",
+    "electron": "^1.4.6",
     "tslint": "^3.15.1",
     "typescript": "^2.0.8"
   }
