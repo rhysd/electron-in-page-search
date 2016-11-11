@@ -33,6 +33,7 @@ body {
 }
 
 .inpage-search-back {
+  margin-left: 2px;
   padding-left: 6px;
   padding-right: 2px;
   cursor: pointer;
