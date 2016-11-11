@@ -1,0 +1,17 @@
+{
+  "name": "electron-in-page-search-webview-example",
+  "version": "0.0.0",
+  "private": true,
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "../../node_modules/.bin/electron .",
+    "debug": "ELECTRON_IN_PAGE_SEARCH_DEBUG=true ../../node_modules/.bin/electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "rhysd <lin90162@yahoo.co.jp>",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}
