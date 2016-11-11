@@ -19,7 +19,7 @@ def npm_run(task)
 end
 
 guard :shell do
-  watch %r[^src/.+\.ts$] do |m|
+  watch %r{^(:?src|test)/.+\.ts$} do |m|
     timestamp m[0]
     npm_run 'build'
   end

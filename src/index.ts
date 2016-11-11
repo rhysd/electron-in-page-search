@@ -148,7 +148,7 @@ export class InPageSearch extends EventEmitter {
     startToFind(query: string) {
         this.requestId = this.findInPage(query);
         this.prevQuery = query;
-        this.emit('start');
+        this.emit('start', query);
         this.focusOnInputOnBrowserWindow();
     }
 

@@ -4,12 +4,12 @@
   "description": "Electron module to provide in-page search feature",
   "main": "src/index.js",
   "scripts": {
-    "build": "tsc -p src/",
+    "build": "tsc -p .",
     "lint": "tslint $(git ls-files | grep -E \"\\.ts$\")",
     "example": "npm install && cd example/browser-window && npm start",
-    "watch": "guard --watchdir src",
+    "watch": "guard --watchdir src test",
     "preversion": "npm run lint && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "electron-mocha --timeout 10000 --renderer test/*.js"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,11 @@
   "license": "MIT",
   "devDependencies": {
     "@types/electron": "^1.4.26",
+    "@types/mocha": "^2.2.32",
+    "@types/sinon": "^1.16.31",
     "electron": "^1.4.6",
+    "electron-mocha": "^3.1.1",
+    "sinon": "^1.17.6",
     "tslint": "^3.15.1",
     "typescript": "^2.0.8"
   }
