@@ -7,7 +7,7 @@ const searchInPage = require('../..').default;
 let search;
 const webview = document.getElementById('target-webview');
 webview.addEventListener('dom-ready', () => {
-    search = searchInPage(webview, {openDevToolsOfSearchWindow: true});
+    search = searchInPage(webview);
     console.log(search);
 });
 

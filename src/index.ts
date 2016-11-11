@@ -33,7 +33,7 @@ function injectScriptToWebView(target: Electron.WebViewElement, opts: InPageSear
         document.body.appendChild(s);
     })()`;
 
-    if (target.executeJavaScript) {
+    if (target.getWebContents()) {
         target.executeJavaScript(script);
     } else {
         target.addEventListener('dom-ready', () => {
@@ -62,8 +62,9 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
     injectScriptToWebView(wv, options);
 
     if (options.openDevToolsOfSearchWindow) {
-        if (wv.getWebContents) {
-            wv.getWebContents().openDevTools({mode: 'detach'});
+        const wc = wv.getWebContents();
+        if (wc) {
+            wc.openDevTools({mode: 'detach'});
         } else {
             wv.addEventListener('dom-ready', () => {
                 wv.getWebContents().openDevTools({mode: 'detach'});
