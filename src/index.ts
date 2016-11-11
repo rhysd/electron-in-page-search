@@ -33,7 +33,7 @@ function injectScriptToWebView(target: Electron.WebViewElement, opts: InPageSear
         document.body.appendChild(s);
     })()`;
 
-    if (target.getWebContents()) {
+    if (target.getWebContents && target.getWebContents()) {
         target.executeJavaScript(script);
     } else {
         target.addEventListener('dom-ready', () => {
@@ -62,7 +62,7 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
     injectScriptToWebView(wv, options);
 
     if (options.openDevToolsOfSearchWindow) {
-        const wc = wv.getWebContents();
+        const wc = wv.getWebContents && wv.getWebContents();
         if (wc) {
             wc.openDevTools({mode: 'detach'});
         } else {
@@ -80,6 +80,7 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
 
 export class InPageSearch extends EventEmitter {
     public opened = false;
+    public targetIsWebview = false;
     private findInPage: FindInPage;
     private stopFindInPage: StopFindInPage;
     private requestId: RequestId | null = null;
@@ -91,6 +92,7 @@ export class InPageSearch extends EventEmitter {
         target: SearchTarget,
     ) {
         super();
+        this.targetIsWebview = isWebView(target);
         this.findInPage = target.findInPage.bind(target);
         this.stopFindInPage = target.stopFindInPage.bind(target);
         this.registerFoundCallback(target);
@@ -134,7 +136,7 @@ export class InPageSearch extends EventEmitter {
         this.requestId = this.findInPage(query);
         this.prevQuery = query;
         this.emit('start');
-        this.focusOnInput();
+        this.focusOnInputOnBrowserWindow();
     }
 
     findNext(forward: boolean) {
@@ -146,7 +148,7 @@ export class InPageSearch extends EventEmitter {
             findNext: true,
         });
         this.emit('next', this.prevQuery, forward);
-        this.focusOnInput();
+        this.focusOnInputOnBrowserWindow();
     }
 
     stopFind() {
@@ -250,6 +252,14 @@ export class InPageSearch extends EventEmitter {
             this.searcher.send('electron-in-page-search:focus');
             this.emit('focus-input');
         });
+    }
+
+    private focusOnInputOnBrowserWindow() {
+        if (this.targetIsWebview) {
+            return;
+        }
+        // XXX
+        this.focusOnInput();
     }
 
     private sendResult(nth: number, all: number) {
