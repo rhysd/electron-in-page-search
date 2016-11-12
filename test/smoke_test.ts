@@ -50,7 +50,7 @@ context('For browser window', function () {
             A.equal(w.className, 'electron-in-page-search-window search-active');
 
             const next = spy();
-            return waitForReady(w).then(() => {
+            return waitForReady(w).then(pause1000ms).then(() => {
                 remote.getCurrentWindow().focusOnWebView();
                 w.executeJavaScript(`(function() {
                     document.querySelector('.inpage-search-input').value = 'foo';
