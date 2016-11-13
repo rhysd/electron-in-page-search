@@ -9,7 +9,8 @@
     "example": "npm install && cd example/browser-window && npm start",
     "watch": "guard --watchdir src test",
     "preversion": "npm run lint && npm run build",
-    "test": "electron-mocha --timeout 10000 --renderer test/*.js"
+    "test": "electron-mocha --timeout 10000 --renderer test/*.js",
+    "gen-dts": "tsc -d src/index.ts && mv src/index.d.ts ."
   },
   "repository": {
     "type": "git",

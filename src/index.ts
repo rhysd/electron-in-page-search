@@ -14,7 +14,8 @@ export interface InPageSearchOptions {
 type RequestId = number;
 type FindInPage = (text: string, options?: Electron.FindInPageOptions) => RequestId;
 type StopFindInPage = (action: Electron.StopFindInPageAtion) => void;
-type SearchTarget = Electron.WebContents | Electron.WebViewElement;
+
+export type SearchTarget = Electron.WebContents | Electron.WebViewElement;
 
 function isWebView(target: any): target is Electron.WebViewElement {
     return target.tagName !== undefined && target.tagName === 'WEBVIEW';
