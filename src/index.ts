@@ -8,6 +8,7 @@ const log = ShouldDebug ? console.log.bind(console) : function nop() { /* nop */
 export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebViewElement;
     customCssPath?: string;
+    customSearchWindowHtmlPath?: string;
     openDevToolsOfSearchWindow?: boolean;
 }
 
@@ -67,7 +68,7 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
     const wv = options.searchWindowWebview;
 
     if (!wv.src) {
-        wv.src = DefaultSearchWindowHtml;
+        wv.src = options.customSearchWindowHtmlPath || DefaultSearchWindowHtml;
     }
 
     injectScriptToWebView(wv, options);
