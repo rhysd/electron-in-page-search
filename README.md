@@ -1,7 +1,6 @@
 In-Page Search for Electron Applications
 ========================================
-[![Build Status](https://travis-ci.org/rhysd/electron-in-page-search.svg?branch=master)](https://travis-ci.org/rhysd/electron-in-page-search)
-
+[![Build Status](https://travis-ci.org/rhysd/electron-in-page-search.svg?branch=master)](https://travis-ci.org/rhysd/electron-in-page-search) 
 This package provides Chrome's native in-page search feature to Electron applications.
 Electron exposes Chrome's native API to JavaScript. But native in-page search API has
 some pitfalls and stateful. So this package wraps it and provide provide more easy,
@@ -186,4 +185,29 @@ Below is a list of hook names.
 | 'next'        | On finding next match                    | `(query: string, forward: boolean)`       |
 | 'focus-input' | On focusing on search window             | `()`                                      |
 | 'found'       | On some word matched to the search query | `(activeMatch: number, allMatch: number)` |
+
+### TypeScript
+
+This package is written in [TypeScript](https://github.com/Microsoft/TypeScript) and ready for TypeScript.
+You need not to prepare type definition file for this package because [index.d.ts](index.d.ts) is
+already in this package.
+
+```typescript
+import searchInPage, {InPageSearch} from 'electron-in-page-search';
+
+let search: InPageSearch;
+const elem = document.createElement('webview');
+elem.src = 'https://example.com';
+
+document.getElementById('main').appendChild(elem);
+elem.on('dom-ready', () => {
+    search = searchInPage(elem);
+});
+
+document.getElementById('search-button').addEventListener('click', () => {
+    if (search) {
+        search.openSearchWindow();
+    }
+});
+```
 
