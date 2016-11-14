@@ -29,6 +29,8 @@ searchInWindow.openSearchWindow();
 searchInWebview.openSearchWindow();
 ```
 
+This package works cross platform (macOS, Linux and Windows).
+
 ## Installation
 
 ```

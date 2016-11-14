@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p .",
     "lint": "tslint $(git ls-files | grep -E \"\\.ts$\")",
-    "example": "npm install && cd example/browser-window && npm start",
+    "example": "npm install && npm run build && cd example/browser-window && npm start",
     "watch": "guard --watchdir src test",
     "preversion": "npm run lint && npm run build",
     "test": "electron-mocha --timeout 10000 --renderer test/*.js",
