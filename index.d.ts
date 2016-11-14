@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebViewElement;
     customCssPath?: string;
+    customSearchWindowHtmlPath?: string;
     openDevToolsOfSearchWindow?: boolean;
 }
 export declare type SearchTarget = Electron.WebContents | Electron.WebViewElement;
