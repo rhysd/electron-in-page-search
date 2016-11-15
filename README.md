@@ -42,8 +42,8 @@ $ npm install --save electron-in-page-search
 
 Two examples are added. So please see the code of working app there.
 
-- [Search in browser window](examples/browser-window)
-- [Search in `<webview>`](examples/webview)
+- [Search in browser window](example/browser-window)
+- [Search in `<webview>`](example/webview)
 
 You can try them by cloning this repository.
 
