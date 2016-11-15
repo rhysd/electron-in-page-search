@@ -1,6 +1,8 @@
 In-Page Search for Electron Applications
 ========================================
-[![Build Status](https://travis-ci.org/rhysd/electron-in-page-search.svg?branch=master)](https://travis-ci.org/rhysd/electron-in-page-search) 
+[![npm version](https://badge.fury.io/js/electron-in-page-search.svg)](https://badge.fury.io/js/electron-in-page-search)
+[![Build Status](https://travis-ci.org/rhysd/electron-in-page-search.svg?branch=master)](https://travis-ci.org/rhysd/electron-in-page-search)
+
 This package provides Chrome's native in-page search feature to Electron applications.
 Electron exposes Chrome's native API to JavaScript. But native in-page search API has
 some pitfalls and stateful. So this package wraps it and provide provide more easy,
