@@ -113,7 +113,9 @@ Finally the users can close a search window by clicking 'close' button to stop t
 After a search window closing, the window's class property will be `electron-in-page-search-window search-inactive`
 again.
 
-## Debugging
+## Development
+
+### Debugging
 
 If you want to see a DevTools of search window, please pass `openDevToolsOfSearchWindow`
 property to `searchInPage` function as below.
@@ -126,6 +128,31 @@ It opens the DevTools with detach mode.
 
 And this package also supports logging. When `$ELECTRON_IN_PAGE_SEARCH_DEBUG` environment
 variable is not empty, it outputs logs with `console.log` in rendrer process.
+
+### TypeScript
+
+This package is written in [TypeScript](https://github.com/Microsoft/TypeScript) and ready for TypeScript.
+You need not to prepare type definition file for this package because [index.d.ts](index.d.ts) is
+already in this package.
+
+```typescript
+import searchInPage, {InPageSearch} from 'electron-in-page-search';
+
+let search: InPageSearch;
+const elem = document.createElement('webview');
+elem.src = 'https://example.com';
+
+document.getElementById('main').appendChild(elem);
+elem.on('dom-ready', () => {
+    search = searchInPage(elem);
+});
+
+document.getElementById('search-button').addEventListener('click', () => {
+    if (search) {
+        search.openSearchWindow();
+    }
+});
+```
 
 ## Customization
 
@@ -191,28 +218,24 @@ Below is a list of hook names.
 | 'focus-input' | On focusing on search window             | `()`                                      |
 | 'found'       | On some word matched to the search query | `(activeMatch: number, allMatch: number)` |
 
-### TypeScript
+### Animation for search window
 
-This package is written in [TypeScript](https://github.com/Microsoft/TypeScript) and ready for TypeScript.
-You need not to prepare type definition file for this package because [index.d.ts](index.d.ts) is
-already in this package.
+You can use CSS animation for animation of search window. If you don't want to animate a search window when the webview is mounted, please use `search-firstpaint` class name as below:
 
-```typescript
-import searchInPage, {InPageSearch} from 'electron-in-page-search';
+```css
+.electron-in-page-search-window.search-firstpaint {
+  visibility: hidden;
+}
 
-let search: InPageSearch;
-const elem = document.createElement('webview');
-elem.src = 'https://example.com';
+.electron-in-page-search-window.search-inactive {
+  animation-duration: 0.2s;
+  animation-name: yourAwesomeAnimationOnClosing;
+}
 
-document.getElementById('main').appendChild(elem);
-elem.on('dom-ready', () => {
-    search = searchInPage(elem);
-});
-
-document.getElementById('search-button').addEventListener('click', () => {
-    if (search) {
-        search.openSearchWindow();
-    }
-});
+.electron-in-page-search-window.search-active {
+  animation-duration: 0.2s;
+  animation-name: yourAwesomeAnimationOnOpening;
+}
 ```
 
+The `search-firstpaint` class will be removed when opening search window at first.

@@ -113,6 +113,7 @@ export class InPageSearch extends EventEmitter {
         this.registerFoundCallback(target);
         this.setupSearchWindowWebview();
         this.searcher.classList.add('search-inactive');
+        this.searcher.classList.add('search-firstpaint');
         this.prevQuery = '';
     }
 
@@ -122,6 +123,7 @@ export class InPageSearch extends EventEmitter {
             return;
         }
         this.searcher.classList.remove('search-inactive');
+        this.searcher.classList.remove('search-firstpaint');
         this.searcher.classList.add('search-active');
         this.opened = true;
         this.emit('open');
