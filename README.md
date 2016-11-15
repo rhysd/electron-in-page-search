@@ -86,6 +86,7 @@ while searching. So you can styling the search window webview by CSS like below:
 .electron-in-page-search-window {
   width: 300px;
   height: 36px;
+  background-color: white;
 }
 
 .electron-in-page-search-window.search-inactive {
@@ -96,6 +97,10 @@ while searching. So you can styling the search window webview by CSS like below:
   visibility: visible;
 }
 ```
+
+You can control background color of search window by adding `background-color`
+(in above, `white` is specified). You can customize CSS further (please see below
+'Customization' section).
 
 Please see [example's style](example/browser-window/style.css) for live example.
 
