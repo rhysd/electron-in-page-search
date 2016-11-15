@@ -35,7 +35,7 @@ context('For browser window', function () {
             A.ok(!s.targetIsWebview);
 
             const w = document.querySelector('webview') as Electron.WebViewElement;
-            A.equal(w.className, 'electron-in-page-search-window search-inactive');
+            A.equal(w.className, 'electron-in-page-search-window search-inactive search-firstpaint');
 
             const opened = spy();
             s.on('open', opened);
