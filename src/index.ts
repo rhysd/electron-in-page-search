@@ -22,9 +22,30 @@ function isWebView(target: any): target is Electron.WebViewElement {
     return target.tagName !== undefined && target.tagName === 'WEBVIEW';
 }
 
+function fixPathSlashes(p: string) {
+    if (path.sep === '/') {
+        return p;
+    }
+    // Note:
+    // On Windows, path separator is not '/' but browser seems to understand
+    // '/' separator only. So we need to convert separator manually.
+    //
+    // e.g.
+    //  C:\Users\foo\bar\piyo.html -> /C:/Users/foo/bar/piyo.html
+    //
+    // c.f.
+    //  https://github.com/electron/electron/issues/1298
+    const r = new RegExp(path.sep, 'g');
+    let replaced = p.replace(r, '/');
+    if (replaced[0] !== '/') {
+        replaced = '/' + replaced;
+    }
+    return replaced;
+}
+
 function injectScriptToWebView(target: Electron.WebViewElement, opts: InPageSearchOptions) {
-    const injected_script = path.join(__dirname, 'search-window.js');
-    const css = opts.customCssPath || path.join(__dirname, 'default-style.css');
+    const injected_script = fixPathSlashes(path.join(__dirname, 'search-window.js'));
+    const css = fixPathSlashes(opts.customCssPath || path.join(__dirname, 'default-style.css'));
     const script = `(function(){
         const l = document.createElement('link');
         l.rel = 'stylesheet';
