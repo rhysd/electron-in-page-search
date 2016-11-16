@@ -1,2 +1,5 @@
 node_modules
 Guardfile
+.travis.yml
+appveyor.yml
+tslint.json
