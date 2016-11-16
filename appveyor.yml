@@ -1,7 +1,7 @@
 version: "{build}"
 
 environment:
-  - nodejs_version: "7"
+  nodejs_version: "7"
 
 init:
   - git config --global core.autocrlf false
