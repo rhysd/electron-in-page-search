@@ -1,7 +1,8 @@
 In-Page Search for Electron Applications
 ========================================
 [![npm version](https://badge.fury.io/js/electron-in-page-search.svg)](https://badge.fury.io/js/electron-in-page-search)
-[![Build Status](https://travis-ci.org/rhysd/electron-in-page-search.svg?branch=master)](https://travis-ci.org/rhysd/electron-in-page-search)
+[![Build Status on Travis CI](https://travis-ci.org/rhysd/electron-in-page-search.svg?branch=master)](https://travis-ci.org/rhysd/electron-in-page-search)
+[![Build Status on AppVeyor](https://ci.appveyor.com/api/projects/status/k80y8ccgpbt1ba57?svg=true)](https://ci.appveyor.com/project/rhysd/electron-in-page-search)
 
 This package provides Chrome's native in-page search feature to Electron applications.
 Electron exposes Chrome's native API to JavaScript. But native in-page search API has
@@ -30,7 +31,7 @@ searchInWindow.openSearchWindow();
 searchInWebview.openSearchWindow();
 ```
 
-This package works cross platform (macOS, Linux and Windows).
+This package works cross platform (macOS, Linux and Windows) with running CI on them (Travis CI for macOS and Linux, AppVeyor for Windows).
 
 ## Installation
 
@@ -155,6 +156,14 @@ document.getElementById('search-button').addEventListener('click', () => {
     }
 });
 ```
+
+### My Environment
+
+I'm testing this package with below OS
+
+- macOS 10.12, OS X 10.11.6
+- Ubuntu Linux 16.04 LTS
+- Windows 8.1
 
 ## Customization
 
