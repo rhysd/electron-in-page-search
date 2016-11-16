@@ -23,7 +23,7 @@ function isWebView(target: any): target is Electron.WebViewElement {
 }
 
 function fixPathSlashes(p: string) {
-    if (path.sep === '/') {
+    if (process.platform !== 'win32') {
         return p;
     }
     // Note:
@@ -35,8 +35,7 @@ function fixPathSlashes(p: string) {
     //
     // c.f.
     //  https://github.com/electron/electron/issues/1298
-    const r = new RegExp(path.sep, 'g');
-    let replaced = p.replace(r, '/');
+    let replaced = p.replace(/\\/g, '/');
     if (replaced[0] !== '/') {
         replaced = '/' + replaced;
     }
