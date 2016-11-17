@@ -41,7 +41,11 @@ search_input.addEventListener('keydown', e => {
     }
     switch (e.code) {
     case 'Enter':
-        ipc.sendToHost('electron-in-page-search:query', search_input.value);
+        if (e.shiftKey) {
+            ipc.sendToHost('electron-in-page-search:back', search_input.value);
+        } else {
+            ipc.sendToHost('electron-in-page-search:query', search_input.value);
+        }
         break;
     case 'Escape':
         ipc.sendToHost('electron-in-page-search:close');
