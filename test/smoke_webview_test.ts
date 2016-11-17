@@ -1,4 +1,4 @@
-import injectScriptToWebView from '../src/index';
+import searchInPage from '../src/index';
 import * as A from 'assert';
 import {remote} from 'electron';
 import {spy} from 'sinon';
@@ -20,21 +20,28 @@ function pause1000ms() {
     });
 }
 
-context('For browser window', function () {
-    before(function () {
-        const div = document.createElement('div');
-        div.innerText = 'foo bar baz foo bar piyo poyo';
-        document.body.appendChild(div);
+context('For <webview>', function () {
+    let wv: Electron.WebViewElement;
+
+    before(function (done) {
+        document.body.innerHTML = '';
+        wv = document.createElement('webview');
+        wv.src = 'https://example.com';
+        document.body.appendChild(wv);
+        wv.addEventListener('dom-ready', () => {
+            wv.executeJavaScript(`document.body.innerText = 'foo bar baz foo bar piyo poyo'`);
+            done();
+        });
     });
 
-    describe('injectScriptToWebView()', function () {
+    describe('searchInPage()', function () {
         it('creates search instance which enables in-page search', function () {
-            const s = injectScriptToWebView(remote.getCurrentWebContents());
+            const s = searchInPage(wv);
             A.ok(s);
             A.ok(!s.opened);
-            A.ok(!s.targetIsWebview);
+            A.ok(s.targetIsWebview);
 
-            const w = document.querySelector('webview') as Electron.WebViewElement;
+            const w = document.querySelector('.electron-in-page-search-window') as Electron.WebViewElement;
             A.equal(w.className, 'electron-in-page-search-window search-inactive search-firstpaint');
 
             const opened = spy();
