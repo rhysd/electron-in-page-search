@@ -58,6 +58,8 @@ $ cd example/webview/
 $ npm start # Run webview example
 ```
 
+You can also see [the real world example](https://github.com/rhysd/Chromenu).
+
 To know APIs for this package, you can see [TypeScript's type definitions](index.d.ts).
 
 ## Usage
