@@ -252,7 +252,9 @@ export class InPageSearch extends EventEmitter {
     private setupSearchWindowWebview() {
         this.searcher.classList.add('search-inactive');
         this.searcher.classList.add('search-firstpaint');
-        this.searcherParent.appendChild(this.searcher);
+        if (this.searcher.parentElement === null) {
+            this.searcherParent.appendChild(this.searcher);
+        }
 
         this.searcher.addEventListener('ipc-message', event => {
             switch (event.channel) {
