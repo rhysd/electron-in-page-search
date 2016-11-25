@@ -1,6 +1,6 @@
 {
   "name": "electron-in-page-search",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Electron module to provide in-page search feature",
   "main": "src/index.js",
   "scripts": {

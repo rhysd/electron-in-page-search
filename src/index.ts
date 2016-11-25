@@ -8,6 +8,7 @@ const log = ShouldDebug ? console.log.bind(console) : function nop() { /* nop */
 export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebViewElement;
     searchWindowParent?: HTMLElement;
+    preloadSearchWindow?: boolean;
     customCssPath?: string;
     customSearchWindowHtmlPath?: string;
     openDevToolsOfSearchWindow?: boolean;
@@ -109,6 +110,7 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
         options.searchWindowWebview,
         options.searchWindowParent || document.body,
         searchTarget,
+        !!options.preloadSearchWindow,
     );
 }
 
@@ -123,8 +125,12 @@ export class InPageSearch extends EventEmitter {
         public searcher: Electron.WebViewElement,
         public searcherParent: HTMLElement,
         public searchTarget: SearchTarget,
+        preload: boolean,
     ) {
         super();
+        if (preload) {
+            this.initialize();
+        }
     }
 
     openSearchWindow() {
@@ -133,12 +139,7 @@ export class InPageSearch extends EventEmitter {
             return;
         }
 
-        if (!this.initialized) {
-            this.registerFoundCallback();
-            this.setupSearchWindowWebview();
-            this.prevQuery = '';
-            this.initialized = true;
-        }
+        this.initialize();
 
         this.searcher.classList.remove('search-inactive');
         this.searcher.classList.remove('search-firstpaint');
@@ -194,6 +195,16 @@ export class InPageSearch extends EventEmitter {
     // Or the <webview> element will ramain in DOM and leaks memory.
     finalize() {
         this.searcherParent.removeChild(this.searcher);
+    }
+
+    private initialize() {
+        if (this.initialized) {
+            return;
+        }
+
+        this.registerFoundCallback();
+        this.setupSearchWindowWebview();
+        this.initialized = true;
     }
 
     private onSearchQuery(text: string) {

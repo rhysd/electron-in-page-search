@@ -31,7 +31,8 @@ searchInWindow.openSearchWindow();
 searchInWebview.openSearchWindow();
 ```
 
-This package works cross platform (macOS, Linux and Windows) with running CI on them (Travis CI for macOS and Linux, AppVeyor for Windows).
+This package works cross platform (macOS, Linux and Windows) with running CI on them
+(Travis CI for macOS and Linux, AppVeyor for Windows).
 
 
 
@@ -247,7 +248,8 @@ Below is a list of hook names.
 
 ### Animation for search window
 
-You can use CSS animation for animation of search window. If you don't want to animate a search window when the webview is mounted, please use `search-firstpaint` class name as below:
+You can use CSS animation for animation of search window. If you don't want to animate a search window
+when the webview is mounted, please use `search-firstpaint` class name as below:
 
 ```css
 .electron-in-page-search-window.search-firstpaint {
@@ -266,3 +268,13 @@ You can use CSS animation for animation of search window. If you don't want to a
 ```
 
 The `search-firstpaint` class will be removed when opening search window at first.
+
+### Preload a search window
+
+`InPageSearch` instance delays creating `<webview>` element for a search window
+until first `openSearchWindow` is called at first.
+This is better in terms of memory efficiency because `<webview>` forks a new process.
+
+If you want to load a search window in advance, please set `preloadSearchWindow: true`
+to the second argument of `searchInPage()` call.
+
