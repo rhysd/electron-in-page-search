@@ -73,6 +73,8 @@ context('For browser window', function () {
             }).then(pause1000ms).then(() => {
                 A.ok(!s.opened);
                 A.equal(w.className, 'electron-in-page-search-window search-inactive');
+                s.finalize();
+                A.equal(document.querySelector('webview'), null);
             });
         });
     });

@@ -82,6 +82,7 @@ context('For <webview>', function () {
             }).then(pause1000ms).then(() => {
                 A.ok(!s.opened);
                 A.equal(w.className, 'electron-in-page-search-window search-inactive');
+                s.finalize();
             });
         });
     });

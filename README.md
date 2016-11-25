@@ -33,11 +33,15 @@ searchInWebview.openSearchWindow();
 
 This package works cross platform (macOS, Linux and Windows) with running CI on them (Travis CI for macOS and Linux, AppVeyor for Windows).
 
+
+
 ## Installation
 
 ```
 $ npm install --save electron-in-page-search
 ```
+
+
 
 ## Examples
 
@@ -61,6 +65,8 @@ $ npm start # Run webview example
 You can also see [the real world example](https://github.com/rhysd/Chromenu).
 
 To know APIs for this package, you can see [TypeScript's type definitions](index.d.ts).
+
+
 
 ## Usage
 
@@ -118,6 +124,11 @@ Finally the users can close a search window by clicking 'close' button to stop t
 After a search window closing, the window's class property will be `electron-in-page-search-window search-inactive`
 again.
 
+When you want to destroy `InPageSearch` instance, please ensure to call `.finalize()` method.
+It will unmount the search window `<webview>` from DOM.
+
+
+
 ## Development
 
 ### Debugging
@@ -166,6 +177,8 @@ I'm testing this package with below OS
 - macOS 10.12, OS X 10.11.6
 - Ubuntu Linux 16.04 LTS
 - Windows 8.1
+
+
 
 ## Customization
 

@@ -25,6 +25,7 @@ export declare class InPageSearch extends EventEmitter {
     startToFind(query: string): void;
     findNext(forward: boolean): void;
     stopFind(): void;
+    finalize(): void;
     private onSearchQuery(text);
     private onFoundInPage(result);
     private registerFoundCallback(target);

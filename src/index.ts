@@ -82,7 +82,6 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
         options.searchWindowWebview.className = 'electron-in-page-search-window';
         options.searchWindowWebview.setAttribute('nodeintegration', '');
         options.searchWindowWebview.style.outline = '0';
-        document.body.appendChild(options.searchWindowWebview);
     }
 
     const wv = options.searchWindowWebview;
@@ -132,8 +131,6 @@ export class InPageSearch extends EventEmitter {
         this.stopFindInPage = target.stopFindInPage.bind(target);
         this.registerFoundCallback(target);
         this.setupSearchWindowWebview();
-        this.searcher.classList.add('search-inactive');
-        this.searcher.classList.add('search-firstpaint');
         this.prevQuery = '';
     }
 
@@ -192,6 +189,12 @@ export class InPageSearch extends EventEmitter {
         this.stopFindInPage('clearSelection');
     }
 
+    // You need to call this method when destroying InPageSearch instance.
+    // Or the <webview> element will ramain in DOM and leaks memory.
+    finalize() {
+        document.body.removeChild(this.searcher);
+    }
+
     private onSearchQuery(text: string) {
         log('Query from search window webview:', text);
 
@@ -235,6 +238,10 @@ export class InPageSearch extends EventEmitter {
     }
 
     private setupSearchWindowWebview() {
+        this.searcher.classList.add('search-inactive');
+        this.searcher.classList.add('search-firstpaint');
+        document.body.appendChild(this.searcher);
+
         this.searcher.addEventListener('ipc-message', event => {
             switch (event.channel) {
                 case 'electron-in-page-search:query': {
@@ -272,6 +279,7 @@ export class InPageSearch extends EventEmitter {
                     break;
             }
         });
+
         if (ShouldDebug) {
             this.searcher.addEventListener('console-message', e => {
                 log('Console message from search window:', `line:${e.line}: ${e.message}`, e.sourceId);
