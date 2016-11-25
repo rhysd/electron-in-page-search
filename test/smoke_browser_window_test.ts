@@ -30,10 +30,8 @@ context('For browser window', function () {
             const s = searchInPage(remote.getCurrentWebContents());
             A.ok(s);
             A.ok(!s.opened);
-            A.ok(!s.targetIsWebview);
 
-            const w = document.querySelector('webview') as Electron.WebViewElement;
-            A.equal(w.className, 'electron-in-page-search-window search-inactive search-firstpaint');
+            A.equal(document.querySelector('webview'), null);
 
             const opened = spy();
             s.on('open', opened);
@@ -42,10 +40,11 @@ context('For browser window', function () {
             A.ok(opened.called);
             A.ok(s.opened);
 
+            const w = document.querySelector('webview') as Electron.WebViewElement;
+            A.equal(w.className, 'electron-in-page-search-window search-active');
+
             const started = spy();
             s.on('start', started);
-
-            A.equal(w.className, 'electron-in-page-search-window search-active');
 
             const next = spy();
             return waitForReady(w).then(pause1000ms).then(() => {

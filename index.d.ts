@@ -13,14 +13,13 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
 export declare class InPageSearch extends EventEmitter {
     searcher: Electron.WebViewElement;
     searcherParent: HTMLElement;
+    searchTarget: SearchTarget;
     opened: boolean;
-    targetIsWebview: boolean;
-    private findInPage;
-    private stopFindInPage;
     private requestId;
     private prevQuery;
     private activeIdx;
-    constructor(searcher: Electron.WebViewElement, searcherParent: HTMLElement, target: SearchTarget);
+    private initialized;
+    constructor(searcher: Electron.WebViewElement, searcherParent: HTMLElement, searchTarget: SearchTarget);
     openSearchWindow(): void;
     closeSearchWindow(): void;
     isSearching(): boolean;
@@ -30,7 +29,7 @@ export declare class InPageSearch extends EventEmitter {
     finalize(): void;
     private onSearchQuery(text);
     private onFoundInPage(result);
-    private registerFoundCallback(target);
+    private registerFoundCallback();
     private setupSearchWindowWebview();
     private focusOnInput();
     private focusOnInputOnBrowserWindow();

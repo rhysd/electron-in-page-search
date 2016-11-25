@@ -14,8 +14,6 @@ export interface InPageSearchOptions {
 }
 
 type RequestId = number;
-type FindInPage = (text: string, options?: Electron.FindInPageOptions) => RequestId;
-type StopFindInPage = (action: Electron.StopFindInPageAtion) => void;
 
 export type SearchTarget = Electron.WebContents | Electron.WebViewElement;
 
@@ -116,25 +114,17 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
 
 export class InPageSearch extends EventEmitter {
     public opened = false;
-    public targetIsWebview = false;
-    private findInPage: FindInPage;
-    private stopFindInPage: StopFindInPage;
     private requestId: RequestId | null = null;
-    private prevQuery: string;
-    private activeIdx: number = 0;
+    private prevQuery = '';
+    private activeIdx = 0;
+    private initialized = false;
 
     constructor(
         public searcher: Electron.WebViewElement,
         public searcherParent: HTMLElement,
-        target: SearchTarget,
+        public searchTarget: SearchTarget,
     ) {
         super();
-        this.targetIsWebview = isWebView(target);
-        this.findInPage = target.findInPage.bind(target);
-        this.stopFindInPage = target.stopFindInPage.bind(target);
-        this.registerFoundCallback(target);
-        this.setupSearchWindowWebview();
-        this.prevQuery = '';
     }
 
     openSearchWindow() {
@@ -142,6 +132,14 @@ export class InPageSearch extends EventEmitter {
             log('Already opened');
             return;
         }
+
+        if (!this.initialized) {
+            this.registerFoundCallback();
+            this.setupSearchWindowWebview();
+            this.prevQuery = '';
+            this.initialized = true;
+        }
+
         this.searcher.classList.remove('search-inactive');
         this.searcher.classList.remove('search-firstpaint');
         this.searcher.classList.add('search-active');
@@ -170,7 +168,7 @@ export class InPageSearch extends EventEmitter {
     }
 
     startToFind(query: string) {
-        this.requestId = this.findInPage(query);
+        this.requestId = this.searchTarget.findInPage(query);
         this.prevQuery = query;
         this.emit('start', query);
         this.focusOnInputOnBrowserWindow();
@@ -180,7 +178,7 @@ export class InPageSearch extends EventEmitter {
         if (!this.isSearching()) {
             throw new Error('Search did not start yet. Use .startToFind() method to start the search');
         }
-        this.requestId = this.findInPage(this.prevQuery, {
+        this.requestId = this.searchTarget.findInPage(this.prevQuery, {
             forward,
             findNext: true,
         });
@@ -189,7 +187,7 @@ export class InPageSearch extends EventEmitter {
     }
 
     stopFind() {
-        this.stopFindInPage('clearSelection');
+        this.searchTarget.stopFindInPage('clearSelection');
     }
 
     // You need to call this method when destroying InPageSearch instance.
@@ -227,14 +225,14 @@ export class InPageSearch extends EventEmitter {
         }
     }
 
-    private registerFoundCallback(target: SearchTarget) {
-        if (isWebView(target)) {
-            target.addEventListener('found-in-page', event => {
+    private registerFoundCallback() {
+        if (isWebView(this.searchTarget)) {
+            this.searchTarget.addEventListener('found-in-page', event => {
                 this.onFoundInPage(event.result);
             });
         } else {
             // When target is WebContents
-            target.on('found-in-page', (_, result) => {
+            this.searchTarget.on('found-in-page', (_, result) => {
                 this.onFoundInPage(result);
             });
         }
@@ -320,7 +318,7 @@ export class InPageSearch extends EventEmitter {
     // At opening search window webview, it needs to give a focus to the webview
     // anyway in order to set first focus to <input> in it.
     private focusOnInputOnBrowserWindow() {
-        if (this.targetIsWebview) {
+        if (isWebView(this.searchTarget)) {
             return;
         }
         this.focusOnInput();

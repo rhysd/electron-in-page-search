@@ -39,10 +39,6 @@ context('For <webview>', function () {
             const s = searchInPage(wv);
             A.ok(s);
             A.ok(!s.opened);
-            A.ok(s.targetIsWebview);
-
-            const w = document.querySelector('.electron-in-page-search-window') as Electron.WebViewElement;
-            A.equal(w.className, 'electron-in-page-search-window search-inactive search-firstpaint');
 
             const opened = spy();
             s.on('open', opened);
@@ -51,10 +47,11 @@ context('For <webview>', function () {
             A.ok(opened.called);
             A.ok(s.opened);
 
+            const w = document.querySelector('.electron-in-page-search-window') as Electron.WebViewElement;
+            A.equal(w.className, 'electron-in-page-search-window search-active');
+
             const started = spy();
             s.on('start', started);
-
-            A.equal(w.className, 'electron-in-page-search-window search-active');
 
             const next = spy();
             return waitForReady(w).then(pause1000ms).then(() => {
