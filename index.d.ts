@@ -3,6 +3,7 @@
 import { EventEmitter } from 'events';
 export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebViewElement;
+    searchWindowParent?: HTMLElement;
     customCssPath?: string;
     customSearchWindowHtmlPath?: string;
     openDevToolsOfSearchWindow?: boolean;
@@ -11,6 +12,7 @@ export declare type SearchTarget = Electron.WebContents | Electron.WebViewElemen
 export default function searchInPage(searchTarget: SearchTarget, options?: InPageSearchOptions): InPageSearch;
 export declare class InPageSearch extends EventEmitter {
     searcher: Electron.WebViewElement;
+    searcherParent: HTMLElement;
     opened: boolean;
     targetIsWebview: boolean;
     private findInPage;
@@ -18,7 +20,7 @@ export declare class InPageSearch extends EventEmitter {
     private requestId;
     private prevQuery;
     private activeIdx;
-    constructor(searcher: Electron.WebViewElement, target: SearchTarget);
+    constructor(searcher: Electron.WebViewElement, searcherParent: HTMLElement, target: SearchTarget);
     openSearchWindow(): void;
     closeSearchWindow(): void;
     isSearching(): boolean;

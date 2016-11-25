@@ -7,6 +7,7 @@ const log = ShouldDebug ? console.log.bind(console) : function nop() { /* nop */
 
 export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebViewElement;
+    searchWindowParent?: HTMLElement;
     customCssPath?: string;
     customSearchWindowHtmlPath?: string;
     openDevToolsOfSearchWindow?: boolean;
@@ -108,6 +109,7 @@ export default function searchInPage(searchTarget: SearchTarget, options?: InPag
 
     return new InPageSearch(
         options.searchWindowWebview,
+        options.searchWindowParent || document.body,
         searchTarget,
     );
 }
@@ -123,6 +125,7 @@ export class InPageSearch extends EventEmitter {
 
     constructor(
         public searcher: Electron.WebViewElement,
+        public searcherParent: HTMLElement,
         target: SearchTarget,
     ) {
         super();
@@ -192,7 +195,7 @@ export class InPageSearch extends EventEmitter {
     // You need to call this method when destroying InPageSearch instance.
     // Or the <webview> element will ramain in DOM and leaks memory.
     finalize() {
-        document.body.removeChild(this.searcher);
+        this.searcherParent.removeChild(this.searcher);
     }
 
     private onSearchQuery(text: string) {
@@ -240,7 +243,7 @@ export class InPageSearch extends EventEmitter {
     private setupSearchWindowWebview() {
         this.searcher.classList.add('search-inactive');
         this.searcher.classList.add('search-firstpaint');
-        document.body.appendChild(this.searcher);
+        this.searcherParent.appendChild(this.searcher);
 
         this.searcher.addEventListener('ipc-message', event => {
             switch (event.channel) {

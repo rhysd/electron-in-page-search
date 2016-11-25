@@ -124,6 +124,7 @@ Finally the users can close a search window by clicking 'close' button to stop t
 After a search window closing, the window's class property will be `electron-in-page-search-window search-inactive`
 again.
 
+The search window `<webview>` is mounted to `document.body` (or an element specified with `searchWindowParent` option).
 When you want to destroy `InPageSearch` instance, please ensure to call `.finalize()` method.
 It will unmount the search window `<webview>` from DOM.
 
