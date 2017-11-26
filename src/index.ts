@@ -6,7 +6,7 @@ const ShouldDebug = !!process.env.ELECTRON_IN_PAGE_SEARCH_DEBUG;
 const log = ShouldDebug ? console.log.bind(console) : function nop() { /* nop */ };
 
 export interface InPageSearchOptions {
-    searchWindowWebview?: Electron.WebViewElement;
+    searchWindowWebview?: Electron.WebviewTag;
     searchWindowParent?: HTMLElement;
     preloadSearchWindow?: boolean;
     customCssPath?: string;
@@ -16,9 +16,9 @@ export interface InPageSearchOptions {
 
 type RequestId = number;
 
-export type SearchTarget = Electron.WebContents | Electron.WebViewElement;
+export type SearchTarget = Electron.WebContents | Electron.WebviewTag;
 
-function isWebView(target: any): target is Electron.WebViewElement {
+function isWebView(target: any): target is Electron.WebviewTag {
     return target.tagName !== undefined && target.tagName === 'WEBVIEW';
 }
 
@@ -42,7 +42,7 @@ function fixPathSlashes(p: string) {
     return replaced;
 }
 
-function injectScriptToWebView(target: Electron.WebViewElement, opts: InPageSearchOptions) {
+function injectScriptToWebView(target: Electron.WebviewTag, opts: InPageSearchOptions) {
     const injected_script = fixPathSlashes(path.join(__dirname, 'search-window.js'));
     const css = fixPathSlashes(opts.customCssPath || path.join(__dirname, 'default-style.css'));
     const script = `(function(){
@@ -66,10 +66,10 @@ function injectScriptToWebView(target: Electron.WebViewElement, opts: InPageSear
     // have the method to check whether it's dom-ready or not such as .isReady()
     // of app instance.
     if (target.getWebContents && target.getWebContents()) {
-        target.executeJavaScript(script);
+        target.executeJavaScript(script, false);
     } else {
         target.addEventListener('dom-ready', () => {
-            target.executeJavaScript(script);
+            target.executeJavaScript(script, false);
         });
     }
 }
@@ -122,7 +122,7 @@ export class InPageSearch extends EventEmitter {
     private initialized = false;
 
     constructor(
-        public searcher: Electron.WebViewElement,
+        public searcher: Electron.WebviewTag,
         public searcherParent: HTMLElement,
         public searchTarget: SearchTarget,
         preload: boolean,
@@ -169,7 +169,7 @@ export class InPageSearch extends EventEmitter {
     }
 
     startToFind(query: string) {
-        this.requestId = this.searchTarget.findInPage(query);
+        this.requestId = this.searchTarget.findInPage(query) as any; // XXX: electron.d.ts is wrong
         this.prevQuery = query;
         this.emit('start', query);
         this.focusOnInputOnBrowserWindow();
@@ -182,7 +182,7 @@ export class InPageSearch extends EventEmitter {
         this.requestId = this.searchTarget.findInPage(this.prevQuery, {
             forward,
             findNext: true,
-        });
+        }) as any; // XXX: electron.d.ts is wrong
         this.emit('next', this.prevQuery, forward);
         this.focusOnInputOnBrowserWindow();
     }

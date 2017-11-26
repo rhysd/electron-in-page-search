@@ -25,10 +25,9 @@
   "author": "rhysd <lin90162@yahoo.co.jp>",
   "license": "MIT",
   "devDependencies": {
-    "@types/electron": "^1.4.26",
     "@types/mocha": "^2.2.32",
     "@types/sinon": "^1.16.31",
-    "electron": "^1.4.6",
+    "electron": "^1.7.9",
     "electron-mocha": "^3.1.1",
     "sinon": "^1.17.6",
     "tslint": "^3.15.1",

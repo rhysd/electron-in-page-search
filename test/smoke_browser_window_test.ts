@@ -3,7 +3,7 @@ import * as A from 'assert';
 import {remote} from 'electron';
 import {spy} from 'sinon';
 
-function waitForReady(w: Electron.WebViewElement) {
+function waitForReady(w: Electron.WebviewTag) {
     return new Promise(resolve => {
         const c = w.getWebContents && w.getWebContents();
         if (c) {
@@ -40,7 +40,7 @@ context('For browser window', function () {
             A.ok(opened.called);
             A.ok(s.opened);
 
-            const w = document.querySelector('webview') as Electron.WebViewElement;
+            const w = document.querySelector('webview') as Electron.WebviewTag;
             A.equal(w.className, 'electron-in-page-search-window search-active');
 
             const started = spy();
@@ -52,7 +52,7 @@ context('For browser window', function () {
                 w.executeJavaScript(`(function() {
                     document.querySelector('.inpage-search-input').value = 'foo';
                     document.querySelector('.inpage-search-forward').click();
-                })()`);
+                })()`, false);
             }).then(pause1000ms).then(() => {
                 A.ok(started.called);
                 A.equal(started.args[0][0], 'foo');
@@ -61,14 +61,14 @@ context('For browser window', function () {
 
                 w.executeJavaScript(`(function() {
                     document.querySelector('.inpage-search-forward').click();
-                })()`);
+                })()`, false);
             }).then(pause1000ms).then(() => {
                 A.ok(next.called);
                 A.equal(next.args[0][0], 'foo');
                 A.ok(next.args[0][1]);
                 w.executeJavaScript(`(function() {
                     document.querySelector('.inpage-search-close').click();
-                })()`);
+                })()`, false);
             }).then(pause1000ms).then(() => {
                 A.ok(!s.opened);
                 A.equal(w.className, 'electron-in-page-search-window search-inactive');
