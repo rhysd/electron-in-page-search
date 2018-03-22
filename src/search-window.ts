@@ -41,6 +41,7 @@ search_input.addEventListener('keydown', e => {
     }
     switch (e.code) {
     case 'Enter':
+    case 'NumpadEnter':
         if (e.shiftKey) {
             ipc.sendToHost('electron-in-page-search:back', search_input.value);
         } else {
