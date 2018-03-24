@@ -77,6 +77,7 @@ ipc.on('electron-in-page-search:focus', () => {
 
 ipc.on('electron-in-page-search:result', (_: any, nth: number, all: number) => {
     matches.innerText = `${nth}/${all}`;
+    search_input.classList.toggle('inpage-search-input-noresults', all === 0);
 });
 
 ipc.on('electron-in-page-search:close', () => {
