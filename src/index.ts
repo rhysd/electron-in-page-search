@@ -231,7 +231,7 @@ export class InPageSearch extends EventEmitter {
         if (result.activeMatchOrdinal) {
             this.activeIdx = result.activeMatchOrdinal;
         }
-        if (result.finalUpdate && result.matches) {
+        if (result.finalUpdate) {
             this.sendResult(this.activeIdx, result.matches);
         }
     }
