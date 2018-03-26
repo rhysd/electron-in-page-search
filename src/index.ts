@@ -1,9 +1,13 @@
-import {EventEmitter} from 'events';
+import { EventEmitter } from 'events';
 import * as path from 'path';
 
 const DefaultSearchWindowHtml = `file://${path.join(__dirname, 'search-window.html')}`;
 const ShouldDebug = !!process.env.ELECTRON_IN_PAGE_SEARCH_DEBUG;
-const log = ShouldDebug ? console.log.bind(console) : function nop() { /* nop */ };
+const log = ShouldDebug
+    ? console.log.bind(console)
+    : function nop() {
+          /* nop */
+      };
 
 export interface InPageSearchOptions {
     searchWindowWebview?: Electron.WebviewTag;
@@ -17,102 +21,6 @@ export interface InPageSearchOptions {
 type RequestId = number;
 
 export type SearchTarget = Electron.WebContents | Electron.WebviewTag;
-
-function isWebView(target: any): target is Electron.WebviewTag {
-    return target.tagName !== undefined && target.tagName === 'WEBVIEW';
-}
-
-function fixPathSlashes(p: string) {
-    if (process.platform !== 'win32') {
-        return p;
-    }
-    // Note:
-    // On Windows, path separator is not '/' but browser seems to understand
-    // '/' separator only. So we need to convert separator manually.
-    //
-    // e.g.
-    //  C:\Users\foo\bar\piyo.html -> /C:/Users/foo/bar/piyo.html
-    //
-    // c.f.
-    //  https://github.com/electron/electron/issues/1298
-    let replaced = p.replace(/\\/g, '/');
-    if (replaced[0] !== '/') {
-        replaced = '/' + replaced;
-    }
-    return replaced;
-}
-
-function injectScriptToWebView(target: Electron.WebviewTag, opts: InPageSearchOptions) {
-    const injected_script = fixPathSlashes(path.join(__dirname, 'search-window.js'));
-    const css = fixPathSlashes(opts.customCssPath || path.join(__dirname, 'default-style.css'));
-    const script = `(function(){
-        const l = document.createElement('link');
-        l.rel = 'stylesheet';
-        l.href = '${css}';
-        document.head.appendChild(l);
-        const s = document.createElement('script');
-        s.src = 'file://${injected_script}';
-        document.body.appendChild(s);
-    })()`;
-
-    // XXX:
-    // Before <webview> completes to load its web contents, .getWebContents()
-    // (and some other APIs) have some 'statuses'.
-    //
-    // 1. .getWebContents property does not exist
-    // 2. .getWebContents property exsit but .getWebContents() returns undefined
-    //
-    // So we need to check both 1. and 2. Note that <webview> instance doesn't
-    // have the method to check whether it's dom-ready or not such as .isReady()
-    // of app instance.
-    if (target.getWebContents && target.getWebContents()) {
-        target.executeJavaScript(script, false);
-    } else {
-        target.addEventListener('dom-ready', () => {
-            target.executeJavaScript(script, false);
-        });
-    }
-}
-
-export default function searchInPage(searchTarget: SearchTarget, options?: InPageSearchOptions) {
-    options = options || {};
-
-    if (!options.searchWindowWebview) {
-        options.searchWindowWebview = document.createElement('webview');
-        options.searchWindowWebview.className = 'electron-in-page-search-window';
-        options.searchWindowWebview.setAttribute('nodeintegration', '');
-        options.searchWindowWebview.style.outline = '0';
-    }
-
-    const wv = options.searchWindowWebview;
-
-    if (!wv.src) {
-        wv.src = options.customSearchWindowHtmlPath || DefaultSearchWindowHtml;
-    }
-
-    injectScriptToWebView(wv, options);
-
-    if (options.openDevToolsOfSearchWindow) {
-        // XXX:
-        // Please check the comment in injectScriptToWebView() function to know
-        // why .getWebContents property is checked here.
-        const wc = wv.getWebContents && wv.getWebContents();
-        if (wc) {
-            wc.openDevTools({mode: 'detach'});
-        } else {
-            wv.addEventListener('dom-ready', () => {
-                wv.getWebContents().openDevTools({mode: 'detach'});
-            });
-        }
-    }
-
-    return new InPageSearch(
-        options.searchWindowWebview,
-        options.searchWindowParent || document.body,
-        searchTarget,
-        !!options.preloadSearchWindow,
-    );
-}
 
 export class InPageSearch extends EventEmitter {
     public opened = false;
@@ -342,4 +250,100 @@ export class InPageSearch extends EventEmitter {
         this.searcher.send('electron-in-page-search:result', nth, all);
         this.emit('found', this.prevQuery, nth, all);
     }
+}
+
+function isWebView(target: any): target is Electron.WebviewTag {
+    return target.tagName !== undefined && target.tagName === 'WEBVIEW';
+}
+
+function fixPathSlashes(p: string) {
+    if (process.platform !== 'win32') {
+        return p;
+    }
+    // Note:
+    // On Windows, path separator is not '/' but browser seems to understand
+    // '/' separator only. So we need to convert separator manually.
+    //
+    // e.g.
+    //  C:\Users\foo\bar\piyo.html -> /C:/Users/foo/bar/piyo.html
+    //
+    // c.f.
+    //  https://github.com/electron/electron/issues/1298
+    let replaced = p.replace(/\\/g, '/');
+    if (replaced[0] !== '/') {
+        replaced = '/' + replaced;
+    }
+    return replaced;
+}
+
+function injectScriptToWebView(target: Electron.WebviewTag, opts: InPageSearchOptions) {
+    const injected_script = fixPathSlashes(path.join(__dirname, 'search-window.js'));
+    const css = fixPathSlashes(opts.customCssPath || path.join(__dirname, 'default-style.css'));
+    const script = `(function(){
+        const l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = '${css}';
+        document.head.appendChild(l);
+        const s = document.createElement('script');
+        s.src = 'file://${injected_script}';
+        document.body.appendChild(s);
+    })()`;
+
+    // XXX:
+    // Before <webview> completes to load its web contents, .getWebContents()
+    // (and some other APIs) have some 'statuses'.
+    //
+    // 1. .getWebContents property does not exist
+    // 2. .getWebContents property exsit but .getWebContents() returns undefined
+    //
+    // So we need to check both 1. and 2. Note that <webview> instance doesn't
+    // have the method to check whether it's dom-ready or not such as .isReady()
+    // of app instance.
+    if (target.getWebContents && target.getWebContents()) {
+        target.executeJavaScript(script, false);
+    } else {
+        target.addEventListener('dom-ready', () => {
+            target.executeJavaScript(script, false);
+        });
+    }
+}
+
+export default function searchInPage(searchTarget: SearchTarget, options?: InPageSearchOptions) {
+    options = options || {};
+
+    if (!options.searchWindowWebview) {
+        options.searchWindowWebview = document.createElement('webview');
+        options.searchWindowWebview.className = 'electron-in-page-search-window';
+        options.searchWindowWebview.setAttribute('nodeintegration', '');
+        options.searchWindowWebview.style.outline = '0';
+    }
+
+    const wv = options.searchWindowWebview;
+
+    if (!wv.src) {
+        wv.src = options.customSearchWindowHtmlPath || DefaultSearchWindowHtml;
+    }
+
+    injectScriptToWebView(wv, options);
+
+    if (options.openDevToolsOfSearchWindow) {
+        // XXX:
+        // Please check the comment in injectScriptToWebView() function to know
+        // why .getWebContents property is checked here.
+        const wc = wv.getWebContents && wv.getWebContents();
+        if (wc) {
+            wc.openDevTools({ mode: 'detach' });
+        } else {
+            wv.addEventListener('dom-ready', () => {
+                wv.getWebContents().openDevTools({ mode: 'detach' });
+            });
+        }
+    }
+
+    return new InPageSearch(
+        options.searchWindowWebview,
+        options.searchWindowParent || document.body,
+        searchTarget,
+        !!options.preloadSearchWindow,
+    );
 }
