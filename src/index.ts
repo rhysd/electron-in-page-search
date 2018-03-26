@@ -77,7 +77,7 @@ export class InPageSearch extends EventEmitter {
     }
 
     startToFind(query: string) {
-        this.requestId = this.searchTarget.findInPage(query) as any; // XXX: electron.d.ts is wrong
+        this.requestId = this.searchTarget.findInPage(query);
         this.activeIdx = 0;
         this.prevQuery = query;
         this.emit('start', query);
