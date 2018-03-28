@@ -1,4 +1,4 @@
-import {ipcRenderer as ipc} from 'electron';
+import { ipcRenderer as ipc } from 'electron';
 
 const search_button = document.querySelector('.inpage-search-button') as HTMLButtonElement;
 const matches = document.querySelector('.inpage-search-matches') as HTMLDivElement;
@@ -40,24 +40,24 @@ search_input.addEventListener('keydown', e => {
         return;
     }
     switch (e.code) {
-    case 'Enter':
-    case 'NumpadEnter':
-        if (e.shiftKey) {
-            ipc.sendToHost('electron-in-page-search:back', search_input.value);
-        } else {
-            ipc.sendToHost('electron-in-page-search:query', search_input.value);
-        }
-        break;
-    case 'Escape':
-        ipc.sendToHost('electron-in-page-search:close');
-        break;
-    case 'KeyG':
-        if (e.ctrlKey) {
+        case 'Enter':
+        case 'NumpadEnter':
+            if (e.shiftKey) {
+                ipc.sendToHost('electron-in-page-search:back', search_input.value);
+            } else {
+                ipc.sendToHost('electron-in-page-search:query', search_input.value);
+            }
+            break;
+        case 'Escape':
             ipc.sendToHost('electron-in-page-search:close');
-        }
-        break;
-    default:
-        return;
+            break;
+        case 'KeyG':
+            if (e.ctrlKey) {
+                ipc.sendToHost('electron-in-page-search:close');
+            }
+            break;
+        default:
+            return;
     }
     console.log('Keydown:', e);
 });
