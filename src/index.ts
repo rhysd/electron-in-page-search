@@ -27,6 +27,7 @@ export class InPageSearch extends EventEmitter {
     private requestId: RequestId | null = null;
     private prevQuery = '';
     private activeIdx = 0;
+    private maxIdx = 0;
     private initialized = false;
 
     constructor(
@@ -79,6 +80,7 @@ export class InPageSearch extends EventEmitter {
     startToFind(query: string) {
         this.requestId = this.searchTarget.findInPage(query);
         this.activeIdx = 0;
+        this.maxIdx = 0;
         this.prevQuery = query;
         this.emit('start', query);
         this.focusOnInputOnBrowserWindow();
@@ -91,7 +93,7 @@ export class InPageSearch extends EventEmitter {
         this.requestId = this.searchTarget.findInPage(this.prevQuery, {
             forward,
             findNext: true,
-        }) as any; // XXX: electron.d.ts is wrong
+        });
         this.emit('next', this.prevQuery, forward);
         this.focusOnInputOnBrowserWindow();
     }
@@ -137,11 +139,15 @@ export class InPageSearch extends EventEmitter {
         if (this.requestId !== result.requestId) {
             return;
         }
-        if (result.activeMatchOrdinal) {
+
+        if (typeof result.activeMatchOrdinal === 'number') {
             this.activeIdx = result.activeMatchOrdinal;
         }
+        if (typeof result.matches === 'number') {
+            this.maxIdx = result.matches;
+        }
         if (result.finalUpdate) {
-            this.sendResult(this.activeIdx, result.matches);
+            this.sendResult();
         }
     }
 
@@ -243,10 +249,20 @@ export class InPageSearch extends EventEmitter {
         if (isWebView(this.searchTarget)) {
             return;
         }
+        if (this.maxIdx !== 0 && this.activeIdx === this.maxIdx) {
+            // XXX:
+            // Add 100ms delay before putting focus when scrolling up for search wrap (#8).
+            // When scrolling up, clearing webview focus is delayed and calling this.focusOnInput()
+            // directly focuses on input before removing focus from <input>.
+            setTimeout(this.focusOnInput.bind(this), 100);
+            return;
+        }
         this.focusOnInput();
     }
 
-    private sendResult(nth: number, all: number) {
+    private sendResult() {
+        const nth = this.activeIdx;
+        const all = this.maxIdx;
         log('Send result:', nth, all);
         this.searcher.send('electron-in-page-search:result', nth, all);
         this.emit('found', this.prevQuery, nth, all);
