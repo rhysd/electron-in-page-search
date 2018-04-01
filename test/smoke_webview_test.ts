@@ -53,6 +53,9 @@ context('For <webview>', function() {
             const started = spy();
             s.on('start', started);
 
+            const stopped = spy();
+            s.on('stop', stopped);
+
             const next = spy();
             return waitForReady(w)
                 .then(pause1000ms)
@@ -95,6 +98,7 @@ context('For <webview>', function() {
                 .then(pause1000ms)
                 .then(() => {
                     A.ok(!s.opened);
+                    A.ok(stopped.called);
                     A.equal(w.className, 'electron-in-page-search-window search-inactive');
                     s.finalize();
                 });
