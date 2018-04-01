@@ -183,10 +183,10 @@ export class InPageSearch extends EventEmitter {
                     break;
                 }
                 case 'electron-in-page-search:back': {
-                    if (this.isSearching()) {
+                    const text = event.args[0] as string;
+                    if (this.isSearching() && text === this.prevQuery) {
                         this.findNext(false);
                     } else {
-                        const text = event.args[0] as string;
                         if (text) {
                             this.onSearchQuery(text);
                         }
@@ -194,10 +194,10 @@ export class InPageSearch extends EventEmitter {
                     break;
                 }
                 case 'electron-in-page-search:forward': {
-                    if (this.isSearching()) {
+                    const text = event.args[0] as string;
+                    if (this.isSearching() && text === this.prevQuery) {
                         this.findNext(true);
                     } else {
-                        const text = event.args[0] as string;
                         if (text) {
                             this.onSearchQuery(text);
                         }
