@@ -237,7 +237,7 @@ export class InPageSearch extends EventEmitter {
     //
     // When the search target is <webview>, focus to <webview> (for search window)
     // won't be cleared. So we need to focus on search window <webview> again after
-    // calling .findInPage(). Futhermore, we should not focus on it because of
+    // calling .findInPage(). Furthermore, we should not focus on it because of
     // <webview> bug. calling .focus() on search window <webview> also gives a focus
     // to another <webview>. As the result, search window <webview> can't have a focus.
     //

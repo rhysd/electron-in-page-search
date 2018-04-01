@@ -1,6 +1,6 @@
 In-Page Search for Electron Applications
 ========================================
-[![npm version](https://badge.fury.io/js/electron-in-page-search.svg)](https://badge.fury.io/js/electron-in-page-search)
+[![npm version](https://badge.fury.io/js/electron-in-page-search.svg)](https://www.npmjs.com/package/electron-in-page-search)
 [![Build Status on Travis CI](https://travis-ci.org/rhysd/electron-in-page-search.svg?branch=master)](https://travis-ci.org/rhysd/electron-in-page-search)
 [![Build Status on AppVeyor](https://ci.appveyor.com/api/projects/status/k80y8ccgpbt1ba57?svg=true)](https://ci.appveyor.com/project/rhysd/electron-in-page-search)
 
@@ -226,7 +226,7 @@ searchInPage(webview, {
 
 electron-in-page-search package injects `<script>` tag to setup IPC messaging between
 a search window `<webview>` and a renderer process. It finds each elements and
-sets listners through class names.
+sets listeners through class names.
 
 So you need to maintain above class names also in your own search window HTML.
 
@@ -278,3 +278,8 @@ This is better in terms of memory efficiency because `<webview>` forks a new pro
 If you want to load a search window in advance, please set `preloadSearchWindow: true`
 to the second argument of `searchInPage()` call.
 
+
+
+## License
+
+[Distributed under the MIT License](./LICENSE)
