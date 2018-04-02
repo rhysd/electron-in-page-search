@@ -71,6 +71,7 @@ context('For <webview>', function() {
                 })
                 .then(pause1000ms)
                 .then(() => {
+                    A.ok(s.isSearching());
                     A.ok(started.called);
                     A.equal(started.args[0][0], 'foo');
 
@@ -97,6 +98,7 @@ context('For <webview>', function() {
                 })
                 .then(pause1000ms)
                 .then(() => {
+                    A.ok(!s.isSearching());
                     A.ok(!s.opened);
                     A.ok(stopped.called);
                     A.equal(w.className, 'electron-in-page-search-window search-inactive');
@@ -158,6 +160,73 @@ context('For <webview>', function() {
                 })
                 .then(pause1000ms)
                 .then(() => {
+                    A.ok(!s.opened);
+                    A.equal(w.className, 'electron-in-page-search-window search-inactive');
+                    s.finalize();
+                    A.equal(document.querySelector('.electron-in-page-search-window'), null);
+                });
+        });
+
+        it('hogehoge can open/close search window repeatedly', function() {
+            const s = searchInPage(wv);
+            s.openSearchWindow();
+            const w = document.querySelector('.electron-in-page-search-window') as Electron.WebviewTag;
+            const next = spy();
+            const start = spy();
+            const stop = spy();
+            return waitForReady(w)
+                .then(pause1000ms)
+                .then(() => {
+                    remote.getCurrentWindow().focusOnWebView();
+                    w.executeJavaScript(
+                        `(function() {
+                            document.querySelector('.inpage-search-input').value = 'foo';
+                            const b = document.querySelector('.inpage-search-forward');
+                            b.click();
+                            b.click();
+                        })()`,
+                        false,
+                    );
+                })
+                .then(pause1000ms)
+                .then(() => s.closeSearchWindow())
+                .then(pause1000ms)
+                .then(() => {
+                    A.equal(w.className, 'electron-in-page-search-window search-inactive');
+                    s.on('next', next);
+                    s.on('start', start);
+                    s.openSearchWindow();
+                })
+                .then(pause1000ms)
+                .then(() => {
+                    remote.getCurrentWindow().focusOnWebView();
+                    w.executeJavaScript(
+                        `(function() {
+                            document.querySelector('.inpage-search-input').value = 'ba';
+                            const b = document.querySelector('.inpage-search-forward');
+                            b.click();
+                            b.click();
+                        })()`,
+                        false,
+                    );
+                })
+                .then(pause1000ms)
+                .then(() => {
+                    A.equal(start.args[0][0], 'ba');
+                    A.equal(next.args[0][0], 'ba');
+                    A.ok(next.args[0][1]);
+                    s.on('stop', stop);
+
+                    w.executeJavaScript(
+                        `(function() {
+                            document.querySelector('.inpage-search-close').click();
+                        })()`,
+                        false,
+                    );
+                })
+                .then(pause1000ms)
+                .then(() => {
+                    A.ok(stop.called);
                     A.ok(!s.opened);
                     A.equal(w.className, 'electron-in-page-search-window search-inactive');
                     s.finalize();
