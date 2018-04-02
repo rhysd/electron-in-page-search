@@ -1,5 +1,12 @@
 import { remote } from 'electron';
 
+export function pause(msec: number) {
+    return () =>
+        new Promise(resolve => {
+            setTimeout(resolve, msec);
+        });
+}
+
 export function waitForReady(w: Electron.WebviewTag) {
     return new Promise(resolve => {
         const c = w.getWebContents && w.getWebContents();
@@ -8,14 +15,7 @@ export function waitForReady(w: Electron.WebviewTag) {
             return;
         }
         w.addEventListener('dom-ready', resolve);
-    });
-}
-
-export function pause(msec: number) {
-    return () =>
-        new Promise(resolve => {
-            setTimeout(resolve, msec);
-        });
+    }).then(pause(500));
 }
 
 export function clickButton(w: Electron.WebviewTag, button: 'forward' | 'back' | 'close') {
