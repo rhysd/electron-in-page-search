@@ -7,7 +7,7 @@ export function pause(msec: number) {
         });
 }
 
-export function waitForReady(w: Electron.WebviewTag) {
+export function waitForReady(w: Electron.WebviewTag, wait: number = 1000) {
     return new Promise(resolve => {
         const c = w.getWebContents && w.getWebContents();
         if (c) {
@@ -15,7 +15,7 @@ export function waitForReady(w: Electron.WebviewTag) {
             return;
         }
         w.addEventListener('dom-ready', resolve);
-    }).then(pause(500));
+    }).then(pause(wait));
 }
 
 export function clickButton(w: Electron.WebviewTag, button: 'forward' | 'back' | 'close') {
