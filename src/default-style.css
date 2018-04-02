@@ -37,18 +37,22 @@ body {
   padding-left: 6px;
   padding-right: 2px;
   cursor: pointer;
+  user-select: none;
 }
 
 .inpage-search-forward {
   padding-left: 2px;
   padding-right: 6px;
   cursor: pointer;
+  user-select: none;
 }
 
 .inpage-search-close {
   margin-left: 4px;
   padding: 0 2px;
   cursor: pointer;
+  user-select: none;
+  font-size: 0.8em;
 }
 
 .inpage-search-back:hover,
