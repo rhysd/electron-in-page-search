@@ -7,7 +7,7 @@
     "build": "tsc -p .",
     "lint": "tslint -p .",
     "example": "npm install && npm run build && cd example/browser-window && npm start",
-    "watch": "guard --watchdir src test",
+    "watch": "tsc -p . --watch",
     "preversion": "npm run lint && npm run build",
     "test": "electron-mocha --timeout 10000 --renderer test/*.js",
     "gen-dts": "tsc -d src/index.ts && mv src/index.d.ts ."

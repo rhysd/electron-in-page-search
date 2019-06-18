@@ -48,14 +48,18 @@ export class InPageSearch extends EventEmitter {
             return;
         }
 
-        this.initialize();
+        const mounted = this.initialize();
 
         this.searcher.classList.remove('search-inactive');
         this.searcher.classList.remove('search-firstpaint');
         this.searcher.classList.add('search-active');
         this.opened = true;
         this.emit('open');
-        this.focusOnInput();
+        if (mounted) {
+            this.searcher.addEventListener('dom-ready', () => this.focusOnInput());
+        } else {
+            this.focusOnInput();
+        }
     }
 
     closeSearchWindow() {
@@ -112,10 +116,10 @@ export class InPageSearch extends EventEmitter {
         if (this.initialized) {
             return;
         }
+        this.initialized = true;
 
         this.registerFoundCallback();
-        this.setupSearchWindowWebview();
-        this.initialized = true;
+        return this.setupSearchWindowWebview();
     }
 
     private onSearchQuery(text: string) {
@@ -165,10 +169,12 @@ export class InPageSearch extends EventEmitter {
     }
 
     private setupSearchWindowWebview() {
+        let appended = false;
         this.searcher.classList.add('search-inactive');
         this.searcher.classList.add('search-firstpaint');
         if (this.searcher.parentElement === null) {
             this.searcherParent.appendChild(this.searcher);
+            appended = true;
         }
 
         this.searcher.addEventListener('ipc-message', event => {
@@ -214,6 +220,8 @@ export class InPageSearch extends EventEmitter {
                 log('Console message from search window:', `line:${e.line}: ${e.message}`, e.sourceId);
             });
         }
+
+        return appended;
     }
 
     private focusOnInput() {
