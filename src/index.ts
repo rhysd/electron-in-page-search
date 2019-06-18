@@ -221,11 +221,11 @@ export class InPageSearch extends EventEmitter {
         // XXX:
         // Directly calling .focus() doesn't focus on <webview> here.
         // We need to delay the call in order to fix it.
-        setImmediate(() => {
+        setTimeout(() => {
             this.searcher.focus();
             this.searcher.send('electron-in-page-search:focus');
             this.emit('focus-input');
-        });
+        }, 0);
     }
 
     // XXX:
